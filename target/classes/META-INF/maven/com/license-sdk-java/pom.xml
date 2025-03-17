@@ -3,8 +3,9 @@
   <groupId>com</groupId>
   <artifactId>license-sdk-java</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-    <dependencies>
-	    <dependency>
+  <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
 	    <groupId>com.alibaba.fastjson2</groupId>
 	    <artifactId>fastjson2</artifactId>
 	    <version>2.0.55</version>
