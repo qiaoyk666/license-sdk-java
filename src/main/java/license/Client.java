@@ -36,7 +36,7 @@ public class Client {
 		this.prodKey = prodKey;
 	}
 	
-	public InitResp init() throws Exception {	
+	public InitResp init() {	
 		InitResp initResp = new InitResp("", false);
 		
 		// 1. 获取公钥
@@ -49,11 +49,22 @@ public class Client {
 		}
 		
 		// 2. AES解密返回的数据
-		PubkeyData pubkeyData = this.aes_ECB_decrypt(pubResp.getData(), _public_key.substring(0, 32));
-		if (pubkeyData.getProdKey() != this.prodKey) {
-			String msg = "prodkey not match";
+		PubkeyData pubkeyData;
+		try {
+			pubkeyData = this.aes_ECB_decrypt(pubResp.getData(), _public_key.substring(0, 32));
+			if (pubkeyData.getProdKey() != this.prodKey) {
+				String msg = "prodkey not match";
+				initResp.setMsg(msg);
+				return initResp;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			String msg = "aes decrypt data error: " + e;
 			initResp.setMsg(msg);
+			return initResp;
 		}
+		
 		this.publicKey = pubkeyData.getPublicKey();
 		
 		// 3. 获取权限树
@@ -168,15 +179,15 @@ public class Client {
         
 	}
 	
-	ModuleData getModules() {
+	public ModuleData getModules() {
 		return this.module;
 	}
 	
-	ModuleData getModule(String key) {
+	public ModuleData getModule(String key) {
 		return this.getModuleByKey(this.module, key);
 	}
 	
-	ModuleData getModuleByKey(ModuleData module, String key) {
+	public ModuleData getModuleByKey(ModuleData module, String key) {
 		if (module == null) {
 			return null;
 		}
@@ -194,7 +205,7 @@ public class Client {
 		return null;
 	}
 	
-	boolean validate(String key) {
+	public boolean validate(String key) {
 		ModuleData module = this.getModuleByKey(this.module, key);
 		if (module == null) return false;
 		long now = System.currentTimeMillis() / 1000;
@@ -282,51 +293,51 @@ class LicenseWebSocketClient extends WebSocketClient {
 //}
 
 
-class ModuleData {
-	private String key;
-	private String name;
-	private int issuedTime;
-	private int expireTime;
-	private String extra;
-	private ArrayList<ModuleData> childFuncs;
-	
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public int getIssuedTime() {
-		return issuedTime;
-	}
-	public void setIssuedTime(int issuedTime) {
-		this.issuedTime = issuedTime;
-	}
-	public int getExpireTime() {
-		return expireTime;
-	}
-	public void setExpireTime(int expireTime) {
-		this.expireTime = expireTime;
-	}
-	public String getExtra() {
-		return extra;
-	}
-	public void setExtra(String extra) {
-		this.extra = extra;
-	}
-	public ArrayList<ModuleData> getChildFuncs() {
-		return childFuncs;
-	}
-	public void setChildFuncs(ArrayList<ModuleData> childFuncs) {
-		this.childFuncs = childFuncs;
-	}
-}
+//class ModuleData {
+//	private String key;
+//	private String name;
+//	private int issuedTime;
+//	private int expireTime;
+//	private String extra;
+//	private ArrayList<ModuleData> childFuncs;
+//	
+//	public String getKey() {
+//		return key;
+//	}
+//	public void setKey(String key) {
+//		this.key = key;
+//	}
+//	public String getName() {
+//		return name;
+//	}
+//	public void setName(String name) {
+//		this.name = name;
+//	}
+//	public int getIssuedTime() {
+//		return issuedTime;
+//	}
+//	public void setIssuedTime(int issuedTime) {
+//		this.issuedTime = issuedTime;
+//	}
+//	public int getExpireTime() {
+//		return expireTime;
+//	}
+//	public void setExpireTime(int expireTime) {
+//		this.expireTime = expireTime;
+//	}
+//	public String getExtra() {
+//		return extra;
+//	}
+//	public void setExtra(String extra) {
+//		this.extra = extra;
+//	}
+//	public ArrayList<ModuleData> getChildFuncs() {
+//		return childFuncs;
+//	}
+//	public void setChildFuncs(ArrayList<ModuleData> childFuncs) {
+//		this.childFuncs = childFuncs;
+//	}
+//}
 
 
 class SignData {
@@ -371,30 +382,30 @@ class ModuleResp {
 	}
 }
 
-class InitResp {
-	private String msg;
-	private Boolean result;
-	
-	public InitResp(String msg, Boolean result) {
-		super();
-		this.msg = msg;
-		this.result = result;
-	}
-	public String getMsg() {
-		return msg;
-	}
-	public void setMsg(String msg) {
-		this.msg = msg;
-	}
-	public Boolean getResult() {
-		return result;
-	}
-	public void setResult(Boolean result) {
-		this.result = result;
-	}
-	
-	
-}
+//class InitResp {
+//	private String msg;
+//	private Boolean result;
+//	
+//	public InitResp(String msg, Boolean result) {
+//		super();
+//		this.msg = msg;
+//		this.result = result;
+//	}
+//	public String getMsg() {
+//		return msg;
+//	}
+//	public void setMsg(String msg) {
+//		this.msg = msg;
+//	}
+//	public Boolean getResult() {
+//		return result;
+//	}
+//	public void setResult(Boolean result) {
+//		this.result = result;
+//	}
+//	
+//	
+//}
 
 class PubkeyData {
 	private String publicKey;
