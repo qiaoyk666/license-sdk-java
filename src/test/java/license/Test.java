@@ -5,6 +5,7 @@ public class Test {
 		// 初始化sdk client
 		Client c = new Client("localhost:18080", "10002");
 		InitResp initResult = c.init();
+		System.out.println(initResult.getMsg());
 		if (initResult.getResult() == false) {
 			System.out.println("sdk client init failed");
 			return;

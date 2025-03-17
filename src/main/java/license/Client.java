@@ -52,7 +52,7 @@ public class Client {
 		PubkeyData pubkeyData;
 		try {
 			pubkeyData = this.aes_ECB_decrypt(pubResp.getData(), _public_key.substring(0, 32));
-			if (pubkeyData.getProdKey() != this.prodKey) {
+			if (!this.prodKey.equals(pubkeyData.getProdKey())) {
 				String msg = "prodkey not match";
 				initResp.setMsg(msg);
 				return initResp;
