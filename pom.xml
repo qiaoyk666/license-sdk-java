@@ -2,43 +2,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-  <!--<groupId>com</groupId>
-  <artifactId>license-sdk-java</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>-->
   <groupId>io.github.qiaoyk666</groupId>
   <artifactId>license-sdk-java</artifactId>
+<!--  <version>0.0.1-SNAPSHOT</version>-->
   <version>0.0.1</version>
-  <packaging>jar</packaging>
+<!--  <packaging>jar</packaging> -->  
   <name>license-sdk-java</name>
-  <description>验证许可权限</description>
-  <url>https://github.com/qiaoyk666/license-sdk-java.git</url>
-  <properties>
-  	<java.version>16</java.version>
-  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
-
-    <!--<gpg.passphrase>qiaoyk20210315</gpg.passphrase>
-    <gpg.keyname>D75AC9D6CAB716A9A226110788FFC290B7EDE724</gpg.keyname>
-    <gpg.homedir>C:\Users\admin\.gnupg</gpg.homedir>-->
-  </properties>
+  <description>license-sdk-java</description>
+  <url>https://github.com/qiaoyk666/license-sdk-java</url>
   
-  <!--<licenses>
+  <licenses>
     <license>
         <name>The Apache Software License, Version 2.0</name>
         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
-  </licenses>-->
-    <licenses>
-	    <license>
-	        <name>MIT License</name>
-	        <url>https://opensource.org/licenses/MIT</url>
-	        <distribution>repo</distribution>
-	    </license>
-	</licenses>
+  </licenses>
   
   <!--   开发人员信息         -->
   <developers>
@@ -46,55 +24,56 @@
       <id>qiaoyk</id>
       <name>qiaoyk</name>
       <email>979146919@qq.com</email>
+      <roles>
+        <role>Project Manager</role>
+        <role>Architect</role>
+   	  </roles>
     </developer>
   </developers>
   
   <!--   项目仓库信息         -->
   <scm>
     <connection>https://github.com/qiaoyk666/license-sdk-java.git</connection>
-<!--    <developerConnection>scm:git:ssh://git@github.com:qiaoyk666/license-sdk-java.git</developerConnection>-->
+    <developerConnection>scm:git:ssh://git@github.com:qiaoyk666/license-sdk-java.git</developerConnection>
 <!--    <developerConnection>scm:git:ssh://github.com/qiaoyk666/license-sdk-java.git</developerConnection>
 -->    <url>https://github.com/qiaoyk666/license-sdk-java</url>
   </scm>
   
-  <!--<properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>-->
+  <properties>
+  	<!--<java.version>16</java.version>-->
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!--<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>-->
 
-<dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>bom</artifactId>
-            <version>2.23.10</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
-	
+    <!--<gpg.passphrase>qiaoyk20210315</gpg.passphrase>
+    <gpg.keyname>D75AC9D6CAB716A9A226110788FFC290B7EDE724</gpg.keyname>
+    <gpg.homedir>C:\Users\admin\.gnupg</gpg.homedir>-->
+  </properties>
 
 	<build>
         <plugins>
         	 <!--   javadoc插件 -->
-	        <plugin>
+	        <!--<plugin>
 	            <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-javadoc-plugin</artifactId>
-	            <version>3.3.1</version>
-	            <executions>
-	                <execution>
-	                    <goals>
-	                        <goal>jar</goal>
-	                    </goals>
-	                </execution>
-	            </executions>
-	        </plugin>
+	            <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+	        </plugin>-->
 	        
 	        <!-- 签名文件：maven-gpg-plugin插件会调用上文中安装的GnuPG软件，对文件进行签名 -->
             <plugin>
 	            <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-gpg-plugin</artifactId>
-	            <version>1.6</version>
+	            <version>1.5</version>
 	            <configuration>
                     <executable>E:\gpg4win4.4.0\GnuPG\bin\gpg.exe</executable>
                     <keyname>qiaoyk</keyname>
@@ -114,18 +93,19 @@
 	        <plugin>
 	            <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-source-plugin</artifactId>
-	            <version>3.2.1</version>
+	            <version>2.2.1</version>
 	            <executions>
-	                <execution>
-	                    <goals>
-	                        <goal>jar</goal>
-	                    </goals>
-	                </execution>
-	            </executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
 	        </plugin>
 	        
 	        <!-- 编译插件 -->
-	        <plugin>
+	        <!--<plugin>
 	            <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-compiler-plugin</artifactId>
 	            <version>3.8.1</version>
@@ -133,20 +113,20 @@
 	                <source>17</source>
 	                <target>17</target>
 	            </configuration>
-	        </plugin>
+	        </plugin>-->
 	        
         	
         	 <!--   central发布插件    -->
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.5.0</version>
+                <version>0.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <!-- 这里的publishingServerId是在settings.xml中配置的server认证信息 -->
                     <publishingServerId>central</publishingServerId>
-                    <!--<tokenAuth>true</tokenAuth>
-                     这里的autoPublish是自动发布，而不是手动发布 
+                    <tokenAuth>true</tokenAuth>
+                    <!-- 这里的autoPublish是自动发布，而不是手动发布 
                     <autoPublish>true</autoPublish>
                      这里的waitUntil配置为published是等待发布完成，因为发布完成的时间比较长，所以可以不加这个参数 
                     <waitUntil>published</waitUntil>
@@ -160,41 +140,25 @@
         
     </build>
   
+  	
   
   <dependencies>
-  	<dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>s3</artifactId>
+  	
+	<dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-autoconfigure</artifactId>
+        <version>2.2.9.RELEASE</version>
     </dependency>
-
-    <!-- 为避免Potential Conflicts，你应该将commons-logging.jar从classpath中删除。你可以尝试从项目依赖中排除commons-logging，这样你的应用程序就会被强制使用Spring JCL而不是Commons Logging。 -->
-    <!-- 问题：Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts -->
     <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>apache-client</artifactId>
-        <exclusions>
-            <exclusion>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-            </exclusion>
-        </exclusions>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>2.0.4</version>
     </dependency>
-
-    <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>s3-transfer-manager</artifactId>
-    </dependency>
-
-    <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>aws-crt-client</artifactId>
-    </dependency>
-
     <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <optional>true</optional>
-        <version>1.18.32</version>
+        <version>1.18.30</version>
+        <scope>provided</scope>
     </dependency>
   
     <dependency>
