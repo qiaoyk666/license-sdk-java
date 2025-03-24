@@ -3,19 +3,13 @@
 ### 1 安装(pom.xml)
 #### 在pom.xml添加引用
 ```bash
-<repositories>
-    <repository>
-        <id>github</id>
-        <url>https://github.com/qiaoyk666/license-sdk-java.git</url>
-    </repository>
-</repositories>
  
 <dependencies>
-    <dependency>
-        <groupId>com</groupId>
-        <artifactId>license-sdk-java</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </dependency>
+	<dependency>
+		<groupId>io.github.qiaoyk666</groupId>
+		<artifactId>license-sdk-java</artifactId>
+		<version>0.0.1</version>
+	</dependency>
 </dependencies>
 
 ```
@@ -24,6 +18,9 @@
 ```bash
 
 package license;
+import license.Client;
+import license.InitResp;
+import license.ModuleData;
 
 public class Test {
 	public static void main(String[] args) throws Exception {

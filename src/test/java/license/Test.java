@@ -10,7 +10,7 @@ public class Test {
 			System.out.println("sdk client init failed");
 			return;
 		}
-		
+
 		// 获取权限树
 		ModuleData modules = c.getModules();
 		System.out.println(modules.getName());
@@ -24,7 +24,7 @@ public class Test {
 			System.out.println("key: " + key1 + " is not found");
 			return;
 		}
-	
+
 		// 校验指定key是否有权限
 		String key = "10002.10004";
 		boolean isOk = c.validate(key);

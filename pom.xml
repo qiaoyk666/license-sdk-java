@@ -4,8 +4,8 @@
 
   <groupId>io.github.qiaoyk666</groupId>
   <artifactId>license-sdk-java</artifactId>
-<!--  <version>0.0.1-SNAPSHOT</version>-->
   <version>0.0.1</version>
+  <!--<version>0.0.1</version>-->
 <!--  <packaging>jar</packaging> -->  
   <name>license-sdk-java</name>
   <description>license-sdk-java</description>
@@ -32,12 +32,19 @@
   </developers>
   
   <!--   项目仓库信息         -->
+<!--  <scm>
+    <connection>scm:git:https://github.com/qiaoyk666/license-sdk-java.git</connection>
+    <developerConnection>scm:git:https://git@github.com:qiaoyk666/license-sdk-java.git</developerConnection>
+    <developerConnection>scm:git:ssh://github.com/qiaoyk666/license-sdk-java.git</developerConnection>
+    <url>https://github.com/qiaoyk666/license-sdk-java</url>
+  </scm-->
+  
   <scm>
+    <!--远程仓库git地址-->
     <connection>https://github.com/qiaoyk666/license-sdk-java.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:qiaoyk666/license-sdk-java.git</developerConnection>
-<!--    <developerConnection>scm:git:ssh://github.com/qiaoyk666/license-sdk-java.git</developerConnection>
--->    <url>https://github.com/qiaoyk666/license-sdk-java</url>
-  </scm>
+    <!--github仓库地址-->
+    <url>https://github.com/qiaoyk666/license-sdk-java</url>
+</scm>
   
   <properties>
   	<!--<java.version>16</java.version>-->
@@ -51,14 +58,35 @@
     <gpg.keyname>D75AC9D6CAB716A9A226110788FFC290B7EDE724</gpg.keyname>
     <gpg.homedir>C:\Users\admin\.gnupg</gpg.homedir>-->
   </properties>
+<!--<distributionManagement>
+  <repository>
+    <id>central</id>
+    <url>https://github.com/qiaoyk666/license-sdk-java.git</url>
+  </repository>
+</distributionManagement>-->
 
+ <!-- <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.7.18</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>-->
 	<build>
         <plugins>
         	 <!--   javadoc插件 -->
-	        <!--<plugin>
-	            <groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-javadoc-plugin</artifactId>
-	            <version>2.9.1</version>
+	        
+	        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+	                <failOnError>false</failOnError>
+	            </configuration>
+                <version>3.10.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -67,10 +95,32 @@
                         </goals>
                     </execution>
                 </executions>
-	        </plugin>-->
+            </plugin>
+	       <!-- <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <phase>verify</phase>
+                        <goals>
+                            生成javadoc的jar 
+                            <goal>jar</goal>
+                            生成javadoc的html 
+                            <goal>javadoc</goal>
+                        </goals>
+                        <configuration>
+                            不显示javadoc警告
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <additionalJOption>-Xdoclint:none</additionalJOption>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
 	        
 	        <!-- 签名文件：maven-gpg-plugin插件会调用上文中安装的GnuPG软件，对文件进行签名 -->
-            <plugin>
+            <!--<plugin>
 	            <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-gpg-plugin</artifactId>
 	            <version>1.5</version>
@@ -87,7 +137,26 @@
 	                    </goals>
 	                </execution>
 	            </executions>
-	        </plugin>
+	        </plugin>-->
+	        <!-- GPG -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <executable>E:\gpg4win4.4.0\GnuPG\bin\gpg.exe</executable>
+                    <keyname>qiaoyk</keyname>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 	        
 	        <!-- 附加源代码文件 -->
 	        <plugin>
@@ -120,7 +189,7 @@
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.4.0</version>
+                <version>0.5.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <!-- 这里的publishingServerId是在settings.xml中配置的server认证信息 -->
@@ -144,7 +213,7 @@
   
   <dependencies>
   	
-	<dependency>
+	<!--<dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-autoconfigure</artifactId>
         <version>2.2.9.RELEASE</version>
@@ -159,7 +228,7 @@
         <artifactId>lombok</artifactId>
         <version>1.18.30</version>
         <scope>provided</scope>
-    </dependency>
+    </dependency>-->
   
     <dependency>
 	    <groupId>com.alibaba.fastjson2</groupId>
