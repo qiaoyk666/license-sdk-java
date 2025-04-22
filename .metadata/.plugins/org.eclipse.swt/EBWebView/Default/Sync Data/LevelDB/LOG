@@ -1,2 +1,3 @@
-2025/03/17-10:29:30.177 6fc4 Creating DB E:\wrokspace\github_test\java\license-sdk-java\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Sync Data\LevelDB since it was missing.
-2025/03/17-10:29:30.524 6fc4 Reusing MANIFEST E:\wrokspace\github_test\java\license-sdk-java\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Sync Data\LevelDB/MANIFEST-000001
+2025/04/16-17:03:42.079 74c8 Reusing MANIFEST E:\wrokspace\github_test\java\license-sdk-java\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Sync Data\LevelDB/MANIFEST-000001
+2025/04/16-17:03:42.079 74c8 Recovering log #3
+2025/04/16-17:03:42.079 74c8 Reusing old log E:\wrokspace\github_test\java\license-sdk-java\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Sync Data\LevelDB/000003.log 

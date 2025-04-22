@@ -1,5 +1,7 @@
 package license;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class Test {
 	public static void main(String[] args) throws Exception {
 		// 初始化sdk client
@@ -34,5 +36,35 @@ public class Test {
 			System.out.println("key: " + key + " has no permission");
 		}
 
+		long days = c.getRemainingDays();
+		System.out.println("证书剩余有效期天数：" + days);
+
+		// 监听证书变化
+		c.on(EventType.LicenseChange, new CallbackFunction() {
+
+			@Override
+			public void execute(Object data) {
+				System.out.println("license_change_callback data:" + JSONObject.toJSONString(data));
+			}
+
+		});
+
+		// 监听证书还剩多少天过期
+		c.on(EventType.LicenseExpiring, new CallbackFunction() {
+
+			@Override
+			public void execute(Object data) {
+				System.out.println("license_expiring_callback data:" + data); // {"day": 176}
+			}
+		});
+
+		c.on(EventType.ConnectionError, new CallbackFunction() {
+
+			@Override
+			public void execute(Object data) {
+				System.out.println("websocket Error connection:" + data);
+			}
+		});
 	}
+
 }

@@ -1,13 +1,14 @@
 package license;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,8 +19,55 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
-import org.bouncycastle.crypto.Signer;
 import com.alibaba.fastjson2.JSON;
+
+
+
+enum EventType {
+	LicenseChange("license_change"),
+    ConnectionError("connection_error"),
+    LicenseExpiring("license_expiring");
+    
+    private final String eventType;
+    
+    private EventType(String eventType) {
+    	this.eventType = eventType;
+    }
+	
+    private String getEventType() {
+    	return eventType;
+    }
+}
+
+enum MsgType {
+	WsMsgTypePermissionTree(1),
+    WsMsgTypeExpireWarning(2);
+//
+//	WsMsgTypePermissionTree,WsMsgTypeExpireWarning
+	int msgType;
+	MsgType(int msgType) {
+		this.msgType = msgType;
+	}
+//	
+//	int getMsgType() {
+//    	return this.msgType;
+//    }
+	
+//	private final int value;
+	public int getMsgType() {
+		return msgType;
+	}
+	
+	public static MsgType fromValue(int value) {
+		for (MsgType t: MsgType.values()) {
+			if (t.getMsgType() == value) {
+				return t;
+			}
+		}
+        throw new IllegalArgumentException("No enum constant with value " + value);
+
+	}
+}
 
 
 public class Client {
@@ -31,9 +79,17 @@ public class Client {
 	private String publicKey;
 	ModuleData module;
 	private String _public_key = "9703919fcd22d32a13bb00fba33a2dd0d35746a597f7c5a4843c567c3482c204";
+	
+//	private Map<String, ArrayList<CallbackImpl>> eventCallbacks = new HashMap<String, ArrayList<CallbackImpl>>(); 
+	private Map<EventType, ArrayList<CallbackFunction>> eventCallbacks = new HashMap<EventType, ArrayList<CallbackFunction>>(); 
+	
+	
 	public Client(String endpoint, String prodKey) {
 		this.endpoint = endpoint;
 		this.prodKey = prodKey;
+		this.eventCallbacks.put(EventType.LicenseChange, new ArrayList());
+		this.eventCallbacks.put(EventType.LicenseExpiring, new ArrayList());
+		this.eventCallbacks.put(EventType.ConnectionError, new ArrayList());
 	}
 	
 	public InitResp init() {	
@@ -58,7 +114,6 @@ public class Client {
 				return initResp;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			String msg = "aes decrypt data error: " + e;
 			initResp.setMsg(msg);
@@ -97,6 +152,17 @@ public class Client {
 		return initResp;
 	}
 	
+	public byte[] hexStringToByteArray(String hexString) {
+        int len = hexString.length();
+        byte[] byteArray = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            // 将每两个十六进制字符转换为一个字节
+            byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                                     + Character.digit(hexString.charAt(i+1), 16));
+        }
+        return byteArray;
+    }
+	
 	private void handleWebSocket() {
 		try {
         	LicenseWebSocketClient wsClient = new LicenseWebSocketClient(new URI("ws://" + this.endpoint + "/ws?prodkey=" + this.prodKey), this);
@@ -116,27 +182,45 @@ public class Client {
 	}
 	
 	private boolean verifySign(String pubkey, String sign, String msg) {
-		// 将十六进制字符串转换为字节数组
+//		// 将十六进制字符串转换为字节数组
+//		Base64.Decoder decoder = Base64.getDecoder();
+//		
+//        byte[] publicKeyBytes = new BigInteger(pubkey, 16).toByteArray();   
+//        byte[] signatureBytes = decoder.decode(sign);
+//        byte[] messageBytes = decoder.decode(msg);
+//        
+//        
+//        // 创建Ed25519公钥参数
+//        Ed25519PublicKeyParameters publicKeyParams = new Ed25519PublicKeyParameters(publicKeyBytes, 0);
+//
+//        // 创建签名验证器
+//        Signer signer = new Ed25519Signer();
+//        signer.init(false, publicKeyParams);
+//        signer.update(messageBytes, 0, messageBytes.length);
+//
+//        // 验证签名
+//        boolean isValid = signer.verifySignature(signatureBytes);
+//        System.out.println("签名是否有效: " + isValid);
+            
 		Base64.Decoder decoder = Base64.getDecoder();
-		
-        byte[] publicKeyBytes = new BigInteger(pubkey, 16).toByteArray();   
+        byte[] publicKeyBytes = hexStringToByteArray(pubkey);
         byte[] signatureBytes = decoder.decode(sign);
         byte[] messageBytes = decoder.decode(msg);
         
-        // 创建Ed25519公钥参数
-        Ed25519PublicKeyParameters publicKeyParams = new Ed25519PublicKeyParameters(publicKeyBytes, 0);
-
-        // 创建签名验证器
-        Signer signer = new Ed25519Signer();
-        signer.init(false, publicKeyParams);
-        signer.update(messageBytes, 0, messageBytes.length);
+        // 将公钥转换为Ed25519PublicKeyParameters
+        Ed25519PublicKeyParameters publicKeyParameters = new Ed25519PublicKeyParameters(publicKeyBytes, 0);
 
         // 验证签名
-        boolean isValid = signer.verifySignature(signatureBytes);
-        System.out.println("签名是否有效: " + isValid);
-        return isValid;
+        Ed25519Signer verifier = new Ed25519Signer();
+        verifier.init(false, publicKeyParameters);
+        verifier.update(messageBytes, 0, messageBytes.length);
+
+        boolean isVerified = verifier.verifySignature(signatureBytes);
+        System.out.println("签名是否有效: " + isVerified);
+
+        return isVerified;
 	}
-	
+
 	private PubkeyData aes_ECB_decrypt(String encryptedText, String key) throws Exception {
 		// 将Base64编码的字符串解码为字节数组
 	    byte[] encryptedBytes = Base64.getDecoder().decode(encryptedText);
@@ -218,8 +302,37 @@ public class Client {
 		return true;
 
 	}
+	public long getRemainingDays() {
+		ModuleData module = this.module;
+		long now = System.currentTimeMillis() / 1000;
+		long result = (module.getExpireTime() - now) / 3600 / 24;
+		return result;
+	}
+	
+	public void emit(EventType event, Object data) {
+		ArrayList<CallbackFunction> callbacks = this.eventCallbacks.get(event);
+
+		for (CallbackFunction caller : callbacks) {
+			caller.execute(data);
+		}
+	}
+	
+	
+	public void on(EventType event, CallbackFunction Caller) {
+		(this.eventCallbacks.get(event)).add(Caller);
+	}
+
+
 
 }
+
+//定义函数式接口
+@FunctionalInterface
+interface CallbackFunction {
+ void execute(Object data);
+}
+
+
 
 
 class LicenseWebSocketClient extends WebSocketClient {
@@ -239,14 +352,48 @@ class LicenseWebSocketClient extends WebSocketClient {
     public void onMessage(String s) {
     	System.out.println("websocket message: " + s);
     	SignData signData = JSON.parseObject(s, SignData.class);
-		boolean veryfyResult = this.client.verifyModuleMsg(signData);
-		if (!veryfyResult) {
-			System.out.println("sign validation is not approved");
-			return;
-		}
-		Base64.Decoder decoder = Base64.getDecoder();
-		ModuleData moduleData = JSON.parseObject(new String(decoder.decode(signData.getMsg())), ModuleData.class);
-		this.client.module = moduleData;
+    	Base64.Decoder decoder = Base64.getDecoder();
+//    	if (signData.getMsgType() == int(MsgType.WsMsgTypePermissionTree)) {
+//    	if (signData.getMsgType() == 1) {
+//    		boolean veryfyResult = this.client.verifyModuleMsg(signData);
+//    		if (!veryfyResult) {
+//    			System.out.println("sign validation is not approved");
+//    			return;
+//    		}
+//    		ModuleData moduleData = JSON.parseObject(new String(decoder.decode(signData.getMsg())), ModuleData.class);
+//    		this.client.module = moduleData;
+//    		this.client.emit(EventType.LicenseChange, moduleData);
+//    		
+////    	} else if (signData.getMsgType() == MsgType.WsMsgTypeExpireWarning) {
+//    	} else if (signData.getMsgType() == 2) {
+//    		String msg = new String(decoder.decode(signData.getMsg()));
+//    		System.out.println("msg-----" + msg);
+//    		this.client.emit(EventType.LicenseExpiring, JSON.parse(msg));
+//    	}
+    	
+    
+    	
+    	
+    	switch (MsgType.fromValue(signData.getMsgType())) {
+	    	case WsMsgTypePermissionTree:
+	    		boolean veryfyResult = this.client.verifyModuleMsg(signData);
+	    		if (!veryfyResult) {
+	    			System.out.println("sign validation is not approved");
+	    			return;
+	    		}
+	    		ModuleData moduleData = JSON.parseObject(new String(decoder.decode(signData.getMsg())), ModuleData.class);
+	    		this.client.module = moduleData;
+	    		this.client.emit(EventType.LicenseChange, moduleData);
+	    		break;
+	    	case WsMsgTypeExpireWarning:
+	    		String msg = new String(decoder.decode(signData.getMsg()));
+	    		System.out.println("WsMsgTypeExpireWarning msg: " + msg);
+	    		this.client.emit(EventType.LicenseExpiring, JSON.parse(msg));
+	    		break;
+	    		
+    	}
+    	
+		
     }
 
     @Override
@@ -263,86 +410,13 @@ class LicenseWebSocketClient extends WebSocketClient {
 }
 
 
-//@ClientEndpoint
-//class WebSocketClient {
-//    private Session session;
-//
-//    @OnMessage
-//    public void onMessage(String message) {
-//        System.out.println("Received message: " + message);
-//        // 处理接收到的消息
-//    }
-//
-//    public void connect(String url) {
-//        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-//        try {
-//            session = container.connectToServer(this, new URI(url));
-//            System.out.println("websocket: " + url + " connected!");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void close() {
-//        try {
-//            session.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
-
-
-//class ModuleData {
-//	private String key;
-//	private String name;
-//	private int issuedTime;
-//	private int expireTime;
-//	private String extra;
-//	private ArrayList<ModuleData> childFuncs;
-//	
-//	public String getKey() {
-//		return key;
-//	}
-//	public void setKey(String key) {
-//		this.key = key;
-//	}
-//	public String getName() {
-//		return name;
-//	}
-//	public void setName(String name) {
-//		this.name = name;
-//	}
-//	public int getIssuedTime() {
-//		return issuedTime;
-//	}
-//	public void setIssuedTime(int issuedTime) {
-//		this.issuedTime = issuedTime;
-//	}
-//	public int getExpireTime() {
-//		return expireTime;
-//	}
-//	public void setExpireTime(int expireTime) {
-//		this.expireTime = expireTime;
-//	}
-//	public String getExtra() {
-//		return extra;
-//	}
-//	public void setExtra(String extra) {
-//		this.extra = extra;
-//	}
-//	public ArrayList<ModuleData> getChildFuncs() {
-//		return childFuncs;
-//	}
-//	public void setChildFuncs(ArrayList<ModuleData> childFuncs) {
-//		this.childFuncs = childFuncs;
-//	}
-//}
 
 
 class SignData {
+	
 	private String sign;
 	private String msg;
+	private int msgType;
 	
 	public String getSign() {
 		return sign;
@@ -355,6 +429,12 @@ class SignData {
 	}
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+	public int getMsgType() {
+		return msgType;
+	}
+	public void setMsgType(int msgType) {
+		this.msgType = msgType;
 	}
 }
 
@@ -382,30 +462,6 @@ class ModuleResp {
 	}
 }
 
-//class InitResp {
-//	private String msg;
-//	private Boolean result;
-//	
-//	public InitResp(String msg, Boolean result) {
-//		super();
-//		this.msg = msg;
-//		this.result = result;
-//	}
-//	public String getMsg() {
-//		return msg;
-//	}
-//	public void setMsg(String msg) {
-//		this.msg = msg;
-//	}
-//	public Boolean getResult() {
-//		return result;
-//	}
-//	public void setResult(Boolean result) {
-//		this.result = result;
-//	}
-//	
-//	
-//}
 
 class PubkeyData {
 	private String publicKey;
