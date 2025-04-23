@@ -23,53 +23,6 @@ import com.alibaba.fastjson2.JSON;
 
 
 
-enum EventType {
-	LicenseChange("license_change"),
-    ConnectionError("connection_error"),
-    LicenseExpiring("license_expiring");
-    
-    private final String eventType;
-    
-    private EventType(String eventType) {
-    	this.eventType = eventType;
-    }
-	
-    private String getEventType() {
-    	return eventType;
-    }
-}
-
-enum MsgType {
-	WsMsgTypePermissionTree(1),
-    WsMsgTypeExpireWarning(2);
-//
-//	WsMsgTypePermissionTree,WsMsgTypeExpireWarning
-	int msgType;
-	MsgType(int msgType) {
-		this.msgType = msgType;
-	}
-//	
-//	int getMsgType() {
-//    	return this.msgType;
-//    }
-	
-//	private final int value;
-	public int getMsgType() {
-		return msgType;
-	}
-	
-	public static MsgType fromValue(int value) {
-		for (MsgType t: MsgType.values()) {
-			if (t.getMsgType() == value) {
-				return t;
-			}
-		}
-        throw new IllegalArgumentException("No enum constant with value " + value);
-
-	}
-}
-
-
 public class Client {
 	//	服务地址
 	private String endpoint;
@@ -87,9 +40,9 @@ public class Client {
 	public Client(String endpoint, String prodKey) {
 		this.endpoint = endpoint;
 		this.prodKey = prodKey;
-		this.eventCallbacks.put(EventType.LicenseChange, new ArrayList());
-		this.eventCallbacks.put(EventType.LicenseExpiring, new ArrayList());
-		this.eventCallbacks.put(EventType.ConnectionError, new ArrayList());
+		this.eventCallbacks.put(EventType.LicenseChange, new ArrayList<CallbackFunction>());
+		this.eventCallbacks.put(EventType.LicenseExpiring, new ArrayList<CallbackFunction>());
+		this.eventCallbacks.put(EventType.ConnectionError, new ArrayList<CallbackFunction>());
 	}
 	
 	public InitResp init() {	
@@ -326,11 +279,11 @@ public class Client {
 
 }
 
-//定义函数式接口
-@FunctionalInterface
-interface CallbackFunction {
- void execute(Object data);
-}
+////定义函数式接口
+//@FunctionalInterface
+//interface CallbackFunction {
+// void execute(Object data);
+//}
 
 
 
