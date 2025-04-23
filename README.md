@@ -18,7 +18,9 @@
 ```bash
 
 package license;
+import license.CallbackFunction;
 import license.Client;
+import license.EventType;
 import license.InitResp;
 import license.ModuleData;
 
