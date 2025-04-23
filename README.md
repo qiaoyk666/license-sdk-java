@@ -8,7 +8,7 @@
 	<dependency>
 		<groupId>io.github.qiaoyk666</groupId>
 		<artifactId>license-sdk-java</artifactId>
-		<version>0.0.1</version>
+		<version>0.0.7</version>
 	</dependency>
 </dependencies>
 
