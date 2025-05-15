@@ -3,7 +3,8 @@ package license;
 public enum EventType {
 	LicenseChange("license_change"),
     ConnectionError("connection_error"),
-    LicenseExpiring("license_expiring");
+    LicenseExpiring("license_expiring"),
+	LicenseRevoke("license_revoke");
     
     private final String eventType;
     

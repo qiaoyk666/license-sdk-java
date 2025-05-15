@@ -2,7 +2,9 @@ package license;
 
 public enum MsgType {
 	WsMsgTypePermissionTree(1),
-    WsMsgTypeExpireWarning(2);
+    WsMsgTypeExpireWarning(2),
+    WsMsgTypeRevokeLicense(3),
+    MsgTypeHeartbeat(4);
 
 	int msgType;
 	MsgType(int msgType) {
